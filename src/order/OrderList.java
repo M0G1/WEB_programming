@@ -1,39 +1,33 @@
 package order;
 
+import com.sun.istack.internal.NotNull;
+
+import java.io.*;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.*;
 import java.util.function.UnaryOperator;
 
 public class OrderList implements List<Order> {
 
-    UUID id;
     String address;
     List<Order> orderList;
     int size;
 
     public OrderList(String address) {
-        id = UUID.randomUUID();
         this.address = address;
         orderList = new ArrayList<>();
         size = 0;
     }
 
-    public OrderList(UUID id, int size) {
-        this.id = id;
-        this.orderList = new ArrayList<>(size);
-        this.size = size;
-    }
+//    public OrderList(String address, int size) {
+//        this.address = address;
+//        this.orderList = new ArrayList<>(size);
+//        this.size = size;
+//    }
 
 
 //==============================================Getters=and=Setters=====================================================
-
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
 
     public String getAddress() {
         return address;
@@ -184,5 +178,35 @@ public class OrderList implements List<Order> {
     @Override
     public List<Order> subList(int fromIndex, int toIndex) {
         return orderList.subList(fromIndex, toIndex);
+    }
+
+    //==========================================Static=Read=Write=Method====================================================
+    public static void writeList(@NotNull Writer out, @NotNull OrderList orderList, char separator) throws IOException {
+        out.write(orderList.getAddress() + "\n" +
+                orderList.size() + "\n");
+        if (orderList.size > 0) {
+            for (Order order : orderList)
+                Order.writeOrder(out, order, separator);
+        }
+        out.write("\n");
+    }
+
+    public static OrderList readOrders(@NotNull Reader in, char separator) throws IOException, ParseException {
+
+        BufferedReader reader = new BufferedReader(in);
+        DateFormat df = DateFormat.getDateInstance();
+
+        String addr = reader.readLine();
+        int size = Integer.parseInt(reader.readLine());
+
+        OrderList answer = new OrderList(addr);
+        String orders = reader.readLine();
+
+        StringReader ordersReaders = new StringReader(orders);
+        for (int i = 0; i < size; ++i) {
+            Order order = Order.readOrder(ordersReaders, separator);
+            answer.add(order);
+        }
+        return answer;
     }
 }

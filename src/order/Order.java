@@ -128,49 +128,57 @@ public class Order implements Serializable {
     @Override
     public String toString() {
         Formatter ans = new Formatter();
-        ans.format("order name: %s", name);
-        ans.format("count: %d", count);
-        ans.format("price: %f", price);
+        ans.format("order name: %s ", name);
+        ans.format("count: %d ", count);
+        ans.format("price: %f ", price);
         ans.format("date of receipt: %s", dateOfReceipt.toString());
         return ans.toString();
     }
 
-//================================================Object=Method=========================================================
-
-    public static void writeOrder(@NotNull Writer out, @NotNull Order order) {
-        try {
-            DateFormat df = DateFormat.getDateInstance();
-            out.write(order.getName() + " , " +
-                    order.getCount() + " , " +
-                    order.getPrice() + " , " +
-                    df.format(order.getDateOfReceipt()) + "\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println(e.getMessage());
-        }
+    public String toStringToFile() {
+        DateFormat df = DateFormat.getDateInstance();
+        return this.getName() + " , " +
+                this.getCount() + " , " +
+                this.getPrice() + " , " +
+                df.format(this.getDateOfReceipt());
     }
 
-    public static Order readOrder(@NotNull Reader in) {
+//==========================================Static=Read=Write=Method====================================================
+
+    /*"""
+        It use the method toStringToFile to write in file(format). And plus '\n'
+        For data format is standart of DateFormat.getInstance()
+        Recomended use "\n" separator
+    """*/
+    public static void writeOrder(@NotNull Writer out, @NotNull Order order, @NotNull char separator) throws IOException {
+        out.write(order.toStringToFile() + separator);
+    }
+
+    /*"""
+        It use the method toStringToFile to read in file(format).  And plus '\n'
+        For data format is standart of DateFormat.getInstance()
+    """*/
+    public static Order readOrder(@NotNull Reader in, @NotNull char separator) throws IOException, ParseException {
         Order ans = null;
-        BufferedReader reader = null;
-        try {
-            DateFormat df = DateFormat.getDateInstance();
-            reader = new BufferedReader(in);
-            String[] data = reader.readLine().split(" , ");
-            int count = Integer.parseInt(data[1]);
-            double price = Double.parseDouble(data[2]);
-            Date date = df.parse(data[3]);
 
-            ans = new Order();
-            ans.name = data[0];
-            ans.count = count;
-            ans.price = price;
-            ans.dateOfReceipt = date;
+        DateFormat df = DateFormat.getDateInstance();
 
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-            System.err.println(e.getMessage());
+        StringBuilder temp = new StringBuilder();
+        char curChar;
+        while ((curChar = (char) in.read()) != separator) {
+            temp.append(curChar);
         }
+        String[] data = temp.toString().split(" , ");
+        int count = Integer.parseInt(data[1]);
+        double price = Double.parseDouble(data[2]);
+        Date date = df.parse(data[3]);
+
+        ans = new Order();
+        ans.name = data[0];
+        ans.count = count;
+        ans.price = price;
+        ans.dateOfReceipt = date;
+
         return ans;
     }
 }
