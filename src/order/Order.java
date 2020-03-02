@@ -43,7 +43,6 @@ public class Order implements Serializable {
     private Order() {
     }
 
-    ;
 
     public Order(@NotNull String name, double price, int count, @NotNull Date dateOfReceipt) throws IllegalArgumentException {
         check(name, price, count, dateOfReceipt);
@@ -113,7 +112,7 @@ public class Order implements Serializable {
         Order order = (Order) obj;
         if (order.count != this.count)
             return false;
-        if (order.price != this.price)
+        if ( Math.abs(order.price - this.price) > Double.MIN_NORMAL)
             return false;
         if (!order.name.equals(this.name))
             return false;
@@ -121,8 +120,13 @@ public class Order implements Serializable {
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public Object clone() throws CloneNotSupportedException {
+        Order ans = new Order();
+        ans.name = this.name;
+        ans.count = this.count;
+        ans.price = this.price;
+        ans.dateOfReceipt = this.dateOfReceipt;
+        return ans;
     }
 
     @Override

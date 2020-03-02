@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
@@ -21,8 +22,12 @@ public class Lab1Test {
         try {
             OrderList orderList = new OrderList("adr"),
                     newOrderList;
-            for (int i = 0; i < 3; ++i)
+            for (int i = 0; i < 2; ++i)
                 orderList.add(createOrder());
+
+            for (int i = 0; i < 2; ++i)
+                orderList.add((Order) orderList.get(i).clone());
+
 
             File file = new File("ord.txt");
 
@@ -34,7 +39,18 @@ public class Lab1Test {
             newOrderList = OrderList.readOrders(reader, ';');
             reader.close();
 
-        } catch (IOException | ParseException e) {
+            newOrderList.sortAndSaveUnique();
+            System.out.println("orderList " + Arrays.toString(orderList.toArray()));
+            System.out.println("newOrderList " + Arrays.toString(newOrderList.toArray()));
+
+            Order order = newOrderList.get(0);
+            Order order2 = (Order) order.clone();
+
+            System.out.println(order);
+            System.out.println(order2);
+            System.out.println("equals " + order.equals(order2));
+
+        } catch (IOException | CloneNotSupportedException | ParseException e) {
             e.printStackTrace();
             System.err.println(e.getMessage());
         }

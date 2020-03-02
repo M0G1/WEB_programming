@@ -3,16 +3,23 @@ package order;
 import com.sun.istack.internal.NotNull;
 
 import java.io.*;
+import java.rmi.RemoteException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.*;
 import java.util.function.UnaryOperator;
 
-public class OrderList implements List<Order> {
+public class OrderList implements OrderListInterface {
 
     String address;
     List<Order> orderList;
     int size;
+
+    public OrderList() {
+        this.address = "";
+        orderList = new ArrayList<>();
+        size = 0;
+    }
 
     public OrderList(String address) {
         this.address = address;
@@ -180,6 +187,29 @@ public class OrderList implements List<Order> {
         return orderList.subList(fromIndex, toIndex);
     }
 
+    //==========================================Task====================================================
+
+
+    @Override
+    public void sortAndSaveUnique() throws RemoteException {
+        if (orderList.size() > 1) {
+            this.sort(OrderComparator.getInstance());
+            List<Order> ans = new ArrayList<>();
+            Order prev = orderList.get(0);
+            ans.add(prev);
+
+            for (int i = 1; i < orderList.size(); ++i) {
+                Order cur = orderList.get(i);
+                if (!cur.equals(prev))
+                    ans.add(cur);
+                prev = cur;
+            }
+
+            this.orderList = ans;
+            this.size = ans.size();
+        }
+    }
+
     //==========================================Static=Read=Write=Method====================================================
     public static void writeList(@NotNull Writer out, @NotNull OrderList orderList, char separator) throws IOException {
         out.write(orderList.getAddress() + "\n" +
@@ -209,4 +239,6 @@ public class OrderList implements List<Order> {
         }
         return answer;
     }
+
+
 }
