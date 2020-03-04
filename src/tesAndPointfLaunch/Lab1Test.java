@@ -1,12 +1,9 @@
 package tesAndPointfLaunch;
 
+import order.Item;
 import order.Order;
-import order.OrderList;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
@@ -15,40 +12,43 @@ import java.util.Random;
 
 public class Lab1Test {
     public static void main(String[] args) {
+        //System.out.println("Is list instance of Serializable" + new ArrayList() instanceof Serializable);
+
         testOrderList();
     }
 
+
     public static void testOrderList() {
         try {
-            OrderList orderList = new OrderList("adr"),
-                    newOrderList;
-            for (int i = 0; i < 2; ++i)
-                orderList.add(createOrder());
-
-            for (int i = 0; i < 2; ++i)
-                orderList.add((Order) orderList.get(i).clone());
-
-
+            Order order = new Order("adr"),
+                    newOrder;
+//            for (int i = 0; i < 2; ++i)
+//                orderList.add(createOrder());
+//
+//            for (int i = 0; i < 2; ++i)
+//                orderList.add((Order) orderList.get(i).clone());
+//
+//
             File file = new File("ord.txt");
-
-            FileWriter writer = new FileWriter(file);
-            OrderList.writeList(writer, orderList, ';');
-            writer.close();
+//
+//            FileWriter writer = new FileWriter(file);
+//            OrderList.writeList(writer, orderList, ';');
+//            writer.close();
 
             FileReader reader = new FileReader(file);
-            newOrderList = OrderList.readOrders(reader, ';');
+            newOrder = Order.readOrders(reader, ';');
             reader.close();
 
-            newOrderList.sortAndSaveUnique();
-            System.out.println("orderList " + Arrays.toString(orderList.toArray()));
-            System.out.println("newOrderList " + Arrays.toString(newOrderList.toArray()));
+            System.out.println("orderList " + Arrays.toString(newOrder.toArray()));
+            newOrder = order.sortAndSaveUnique(newOrder);
+            System.out.println("newOrderList " + Arrays.toString(newOrder.toArray()));
 
-            Order order = newOrderList.get(0);
-            Order order2 = (Order) order.clone();
+            Item item = newOrder.get(0);
+            Item item2 = (Item) item.clone();
 
-            System.out.println(order);
-            System.out.println(order2);
-            System.out.println("equals " + order.equals(order2));
+            System.out.println(item);
+            System.out.println(item2);
+            System.out.println("equals " + item.equals(item2));
 
         } catch (IOException | CloneNotSupportedException | ParseException e) {
             e.printStackTrace();
@@ -58,18 +58,18 @@ public class Lab1Test {
 
     public static void testOrder() {
         try {
-            Order r = createOrder();
+            Item r = createOrder();
             File file = new File("ord.txt");
 
             FileWriter writer = new FileWriter(file);
 
-            Order.writeOrder(writer, r, ';');
-            Order.writeOrder(writer, r, ';');
+            Item.writeOrder(writer, r, ';');
+            Item.writeOrder(writer, r, ';');
             writer.close();
 
             FileReader reader = new FileReader(file);
-            Order r1 = Order.readOrder(reader, ';'),
-                    r2 = Order.readOrder(reader, ';');
+            Item r1 = Item.readOrder(reader, ';'),
+                    r2 = Item.readOrder(reader, ';');
 
             reader.close();
 
@@ -79,12 +79,12 @@ public class Lab1Test {
         }
     }
 
-    public static Order createOrder() {
+    public static Item createOrder() {
         String[] dataStr = {"1 th", "2 th", "3 th", "4 th"};
         Random rnd = new Random();
         Date data = new Date(System.currentTimeMillis()
                 + 365L * 24L * 60L * 60L * 1000L);
-        return new Order(
+        return new Item(
                 dataStr[rnd.nextInt(dataStr.length)],
                 rnd.nextInt(100) + 1,
                 rnd.nextInt(10) + 1,

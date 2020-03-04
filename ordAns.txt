@@ -1,0 +1,4 @@
+OrderList before: [item name: 4 th count: 10 price: 9,000000 date of receipt: Tue Mar 02 00:00:00 SAMT 2021, item name: 3 th count: 9 price: 21,000000 date of receipt: Tue Mar 02 00:00:00 SAMT 2021, item name: 4 th count: 10 price: 9,000000 date of receipt: Tue Mar 02 00:00:00 SAMT 2021, item name: 3 th count: 9 price: 21,000000 date of receipt: Tue Mar 02 00:00:00 SAMT 2021]
+adr
+2
+3 th , 9 , 21.0 , 02.03.2021;4 th , 10 , 9.0 , 02.03.2021;

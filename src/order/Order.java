@@ -3,186 +3,223 @@ package order;
 import com.sun.istack.internal.NotNull;
 
 import java.io.*;
+import java.rmi.RemoteException;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Formatter;
+import java.util.*;
 
-public class Order implements Serializable {
-    private String name;
-    private int count;
-    private double price;
-    private Date dateOfReceipt;
+public class Order implements OrderListInterface, List<Item> {
 
+    String address;
+    List<Item> itemList;
 
-    //==================================================check methods=========================================================
-    private static void checkPrice(double price) throws IllegalArgumentException {
-        if (price < 0)
-            throw new IllegalArgumentException(String.format("Negative price: %f ", price));
+    public Order() {
+        this.address = "";
+        itemList = new ArrayList<>();
     }
 
-    private static void checkCount(int count) throws IllegalArgumentException {
-        if (count < 1)
-            throw new IllegalArgumentException(String.format("invalid count of products: %d ", count));
+    public Order(String address) {
+        this.address = address;
+        itemList = new ArrayList<>();
     }
 
-    private static void checkDateOfReceipt(Date dateOfReceipt) throws IllegalArgumentException {
-        if (dateOfReceipt.before(new Date()))
-            throw new IllegalArgumentException(String.format("invalid date of receipt: %s ", dateOfReceipt.toString()));
-    }
+//    public OrderList(String address, int size) {
+//        this.address = address;
+//        this.orderList = new ArrayList<>(size);
+//        this.size = size;
+//    }
 
-    private static void check(String name, double price, int count, Date dateOfReceipt) throws IllegalArgumentException {
-        checkPrice(price);
-        checkCount(count);
-        checkDateOfReceipt(dateOfReceipt);
-    }
-
-//==================================================Constructor=========================================================
-
-    private Order() {
-    }
-
-
-    public Order(@NotNull String name, double price, int count, @NotNull Date dateOfReceipt) throws IllegalArgumentException {
-        check(name, price, count, dateOfReceipt);
-        this.name = name;
-        this.price = price;
-        this.count = count;
-        this.dateOfReceipt = dateOfReceipt;
-    }
 
 //==============================================Getters=and=Setters=====================================================
 
-    public String getName() {
-        return name;
+    public String getAddress() {
+        return address;
     }
 
-    public void setName(@NotNull String name) {
-        this.name = name;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) throws IllegalArgumentException {
-        checkPrice(price);
-        this.price = price;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) throws IllegalArgumentException {
-        checkCount(count);
-        this.count = count;
-    }
-
-    public Date getDateOfReceipt() {
-        return dateOfReceipt;
-    }
-
-    public void setDateOfReceipt(Date dateOfReceipt) {
-        checkDateOfReceipt(dateOfReceipt);
-        this.dateOfReceipt = dateOfReceipt;
-    }
-
-//================================================Object=Method=========================================================
+//================================================List=Interface========================================================
 
     @Override
-    public int hashCode() {
-        int hash = name.hashCode();
-        long f = Double.doubleToLongBits(price);
+    public void sort(Comparator<? super Item> c) {
+        itemList.sort(OrderComparator.getInstance());
+    }
 
-        hash += (int) f + (int) (f >>> 32);
-        hash += count;
-        hash += dateOfReceipt.hashCode();
 
-        return super.hashCode();
+    @Override
+    public int size() {
+        return itemList.size();
+    }
+
+
+    @Override
+    public Iterator<Item> iterator() {
+        return itemList.iterator();
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (!(obj instanceof Order))
-            return false;
-        Order order = (Order) obj;
-        if (order.count != this.count)
-            return false;
-        if ( Math.abs(order.price - this.price) > Double.MIN_NORMAL)
-            return false;
-        if (!order.name.equals(this.name))
-            return false;
-        return order.dateOfReceipt.equals(dateOfReceipt);
+    public Object[] toArray() {
+        return itemList.toArray();
+    }
+
+
+    @Override
+    public boolean isEmpty() {
+        return itemList.isEmpty();
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        Order ans = new Order();
-        ans.name = this.name;
-        ans.count = this.count;
-        ans.price = this.price;
-        ans.dateOfReceipt = this.dateOfReceipt;
-        return ans;
+    public boolean contains(Object o) {
+        return itemList.contains(o);
     }
 
     @Override
-    public String toString() {
-        Formatter ans = new Formatter();
-        ans.format("order name: %s ", name);
-        ans.format("count: %d ", count);
-        ans.format("price: %f ", price);
-        ans.format("date of receipt: %s", dateOfReceipt.toString());
-        return ans.toString();
+    public <T> T[] toArray(T[] a) {
+        return itemList.toArray(a);
     }
 
-    public String toStringToFile() {
-        DateFormat df = DateFormat.getDateInstance();
-        return this.getName() + " , " +
-                this.getCount() + " , " +
-                this.getPrice() + " , " +
-                df.format(this.getDateOfReceipt());
+    @Override
+    public boolean add(Item item) {
+        return itemList.add(item);
     }
 
-//==========================================Static=Read=Write=Method====================================================
-
-    /*"""
-        It use the method toStringToFile to write in file(format). And plus '\n'
-        For data format is standart of DateFormat.getInstance()
-        Recomended use "\n" separator
-    """*/
-    public static void writeOrder(@NotNull Writer out, @NotNull Order order, @NotNull char separator) throws IOException {
-        out.write(order.toStringToFile() + separator);
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return itemList.containsAll(c);
     }
 
-    /*"""
-        It use the method toStringToFile to read in file(format).  And plus '\n'
-        For data format is standart of DateFormat.getInstance()
-    """*/
-    public static Order readOrder(@NotNull Reader in, @NotNull char separator) throws IOException, ParseException {
-        Order ans = null;
+    @Override
+    public boolean addAll(Collection<? extends Item> c) {
+        return itemList.addAll(c);
+    }
 
-        DateFormat df = DateFormat.getDateInstance();
+    @Override
+    public boolean addAll(int index, Collection<? extends Item> c) {
+        return itemList.addAll(index, c);
+    }
 
-        StringBuilder temp = new StringBuilder();
-        char curChar;
-        while ((curChar = (char) in.read()) != separator) {
-            temp.append(curChar);
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        return itemList.removeAll(c);
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        return itemList.retainAll(c);
+    }
+
+    @Override
+    public void clear() {
+        itemList.clear();
+    }
+
+    @Override
+    public int indexOf(Object o) {
+        return itemList.indexOf(o);
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+        return itemList.lastIndexOf(o);
+    }
+
+    @Override
+    public List<Item> subList(int fromIndex, int toIndex) {
+        return itemList.subList(fromIndex, toIndex);
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        boolean res = itemList.remove(o);
+        return res;
+    }
+
+
+    @Override
+    public Item get(int index) {
+        return itemList.get(index);
+    }
+
+    @Override
+    public Item set(int index, Item element) {
+        return itemList.set(index, element);
+    }
+
+    @Override
+    public void add(int index, Item element) {
+        itemList.add(index, element);
+    }
+
+    @Override
+    public Item remove(int index) {
+        Item temp = itemList.remove(index);
+        return temp;
+    }
+
+    @Override
+    public ListIterator<Item> listIterator() {
+        return itemList.listIterator();
+    }
+
+    @Override
+    public ListIterator<Item> listIterator(int index) {
+        return itemList.listIterator(index);
+    }
+
+
+    //==========================================Task====================================================
+
+
+    @Override
+    public Order sortAndSaveUnique(Order order) throws RemoteException {
+        List<Item> surfaceCopy = (List<Item>) ((ArrayList<Item>) order.itemList).clone();
+        surfaceCopy.sort(OrderComparator.getInstance());
+        List<Item> sortedAndUniq = new ArrayList<>();
+        Item prev = surfaceCopy.get(0);
+        sortedAndUniq.add(prev);
+
+        for (int i = 1; i < surfaceCopy.size(); ++i) {
+            Item cur = surfaceCopy.get(i);
+            if (!cur.equals(prev))
+                sortedAndUniq.add(cur);
+            prev = cur;
         }
-        String[] data = temp.toString().split(" , ");
-        int count = Integer.parseInt(data[1]);
-        double price = Double.parseDouble(data[2]);
-        Date date = df.parse(data[3]);
-
-        ans = new Order();
-        ans.name = data[0];
-        ans.count = count;
-        ans.price = price;
-        ans.dateOfReceipt = date;
-
+        Order ans = new Order(order.getAddress());
+        ans.itemList = sortedAndUniq;
         return ans;
     }
+
+    //==========================================Static=Read=Write=Method====================================================
+    public static void writeList(@NotNull Writer out, @NotNull Order order, char separator) throws IOException {
+        out.write(order.getAddress() + "\n" +
+                order.size() + "\n");
+        if (order.size() > 0) {
+            for (Item item : order)
+                Item.writeOrder(out, item, separator);
+        }
+        out.write("\n");
+    }
+
+    public static Order readOrders(@NotNull Reader in, char separator) throws IOException, ParseException {
+
+        BufferedReader reader = new BufferedReader(in);
+        DateFormat df = DateFormat.getDateInstance();
+
+        String addr = reader.readLine();
+        int size = Integer.parseInt(reader.readLine());
+
+        Order answer = new Order(addr);
+        String orders = reader.readLine();
+
+        StringReader ordersReaders = new StringReader(orders);
+        for (int i = 0; i < size; ++i) {
+            Item item = Item.readOrder(ordersReaders, separator);
+            answer.add(item);
+        }
+        return answer;
+    }
+
+
 }

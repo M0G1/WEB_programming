@@ -1,6 +1,7 @@
 package tesAndPointfLaunch;
 
-import order.OrderList;
+import order.Order;
+import order.OrderListInterface;
 
 import java.io.File;
 import java.io.FileReader;
@@ -24,28 +25,33 @@ public class ClientLab1 {
         FileWriter writer;
         FileReader reader;
         try {
-
+            //System.out.print;
             reader = new FileReader(new File(args[0]));
             writer = new FileWriter(new File(args[1]));
 
             try {
                 // получаем доступ к регистру удаленных объектов.
-                final Registry registry = LocateRegistry.createRegistry(666);
+                final Registry registry = LocateRegistry.getRegistry("127.0.0.1", 8080);
                 /*
                     Получаем из регистра нужный объект
                     Работа RMI основана на использовании прокси,
                     поэтому удаленный вызов доступен только для методов интерфейсов,
                     а не классов.*/
-                OrderList serverOrderList = (OrderList) registry.lookup(UNIQUE_BINDING_NAME);
 
-                OrderList readedOrderList = OrderList.readOrders(reader, ';');
-                //передаем на сервер
-                serverOrderList.addAll(readedOrderList);
-                writer.write("ServerOrderList before: " + Arrays.toString(serverOrderList.toArray()) + "\n");
-                //удаленный вызов метода на сервере
-                serverOrderList.sortAndSaveUnique();
+                OrderListInterface server = (OrderListInterface) registry.lookup(UNIQUE_BINDING_NAME);
+
+                //считываем
+                Order readOrder = Order.readOrders(reader, ';');
+
+                writer.write("OrderList before: " + Arrays.toString(readOrder.toArray()) + "\n");
+
+                //передаем на сервер и урудаленно вызов метода на сервере
+                Order ansOfServer = server.sortAndSaveUnique(readOrder);
+
+                System.out.println("ansOfServer " + Arrays.toString(readOrder.toArray()));
+                System.out.println("ansOfServer " + Arrays.toString(ansOfServer.toArray()));
                 //записываем в файл тут)
-                OrderList.writeList(writer, serverOrderList, ';');
+                Order.writeList(writer, ansOfServer, ';');
 
             } catch (RemoteException e) {
                 writer.write("Exception: " + e.getMessage());
@@ -63,4 +69,5 @@ public class ClientLab1 {
             System.err.println(e.getMessage());
         }
     }
+
 }
