@@ -44,7 +44,7 @@ public class Order implements OrderListInterface, List<Item> {
 
     @Override
     public void sort(Comparator<? super Item> c) {
-        itemList.sort(OrderComparator.getInstance());
+        itemList.sort(ItemComparator.getInstance());
     }
 
 
@@ -175,7 +175,7 @@ public class Order implements OrderListInterface, List<Item> {
     @Override
     public Order sortAndSaveUnique(Order order) throws RemoteException {
         List<Item> surfaceCopy = (List<Item>) ((ArrayList<Item>) order.itemList).clone();
-        surfaceCopy.sort(OrderComparator.getInstance());
+        surfaceCopy.sort(ItemComparator.getInstance());
         List<Item> sortedAndUniq = new ArrayList<>();
         Item prev = surfaceCopy.get(0);
         sortedAndUniq.add(prev);
@@ -191,7 +191,7 @@ public class Order implements OrderListInterface, List<Item> {
         return ans;
     }
 
-    //==========================================Static=Read=Write=Method====================================================
+    //==========================================Static=Read=Write=Method================================================
     public static void writeList(@NotNull Writer out, @NotNull Order order, char separator) throws IOException {
         out.write(order.getAddress() + "\n" +
                 order.size() + "\n");
@@ -205,7 +205,6 @@ public class Order implements OrderListInterface, List<Item> {
     public static Order readOrders(@NotNull Reader in, char separator) throws IOException, ParseException {
 
         BufferedReader reader = new BufferedReader(in);
-        DateFormat df = DateFormat.getDateInstance();
 
         String addr = reader.readLine();
         int size = Integer.parseInt(reader.readLine());

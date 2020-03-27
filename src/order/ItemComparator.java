@@ -2,10 +2,10 @@ package order;
 
 import java.util.Comparator;
 
-public class OrderComparator implements Comparator<Item> {
-    transient static final private OrderComparator comparator = new OrderComparator();
+public class ItemComparator implements Comparator<Item> {
+    transient static final private ItemComparator comparator = new ItemComparator();
 
-    public static OrderComparator getInstance() {
+    public static ItemComparator getInstance() {
         return comparator;
     }
 
