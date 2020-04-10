@@ -1,6 +1,6 @@
 package tesAndPointfLaunch;
 
-import order.Order;
+import model.Order;
 
 import java.rmi.AlreadyBoundException;
 import java.rmi.Remote;

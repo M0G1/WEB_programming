@@ -1,7 +1,7 @@
 package tesAndPointfLaunch;
 
-import order.Item;
-import order.Order;
+import model.Item;
+import model.Order;
 
 import java.io.*;
 import java.text.ParseException;

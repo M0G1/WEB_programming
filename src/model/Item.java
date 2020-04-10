@@ -1,4 +1,4 @@
-package order;
+package model;
 
 import com.sun.istack.internal.NotNull;
 
@@ -7,8 +7,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Formatter;
+import java.util.UUID;
 
 public class Item implements Serializable {
+    private UUID id;
     private String name;
     private int count;
     private double price;
@@ -49,9 +51,19 @@ public class Item implements Serializable {
         this.price = price;
         this.count = count;
         this.dateOfReceipt = dateOfReceipt;
+        this.id = UUID.randomUUID();
     }
 
 //==============================================Getters=and=Setters=====================================================
+
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

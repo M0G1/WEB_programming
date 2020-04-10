@@ -1,15 +1,14 @@
-package order;
+package model;
 
 import com.sun.istack.internal.NotNull;
 
 import java.io.*;
 import java.rmi.RemoteException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.*;
 
 public class Order implements OrderListInterface, List<Item> {
-
+    UUID id;
     String address;
     List<Item> itemList;
 
@@ -20,6 +19,7 @@ public class Order implements OrderListInterface, List<Item> {
 
     public Order(String address) {
         this.address = address;
+        this.id= UUID.randomUUID();
         itemList = new ArrayList<>();
     }
 
@@ -39,6 +39,11 @@ public class Order implements OrderListInterface, List<Item> {
     public void setAddress(String address) {
         this.address = address;
     }
+
+    public UUID getId() {
+        return id;
+    }
+
 
 //================================================List=Interface========================================================
 

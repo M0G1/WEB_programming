@@ -1,0 +1,37 @@
+Item - some logic element
+    item_id - UUID    (UUID)
+    item_name - text      (String)
+    item_count - Number      (int)
+    price - double       (double)
+    dateOfReceipt - Data (Date)
+
+OrderItem - relationship between tables
+    item_id - Number
+    order_id - Number
+
+Order - list of Items
+    order_id - Number   (UUID)
+    address - varchar (unique value) (String)
+
+CustomerOrders
+    customer_id - Number (UUID)
+    order_id - Number    (UUID)
+
+Customer -
+    customer_id - Number    (UUID)
+    char_name - text          (String)
+    char_login - varchar         (String) length < 256
+    char_password - varchar      (String) length < 256
+
+
+insert:
+    https://postgrespro.ru/docs/postgresql/9.6/sql-insert
+    insert into "Customer" values(uuid('00000000-0000-0000-0000-000000000000'),'zero_customer','Tim','0000');
+    insert into "Order" values(uuid('00000000-0000-0000-0000-000000000000'),'Molodogvardeyskaya 151');
+    insert into "CustomerOrders" values(uuid('00000000-0000-0000-0000-000000000000'),uuid('00000000-0000-0000-0000-000000000000'))
+update:
+    https://postgrespro.ru/docs/postgresql/9.6/sql-update
+    update "Customer" set char_name = 'Timophey' where customer_id = uuid('00000000-0000-0000-0000-000000000000');
+delete:
+    https://postgrespro.ru/docs/postgresql/9.6/sql-delete
+    delete from "CustomerOrders" where customer_id = uuid('00000000-0000-0000-0000-000000000000') and order_id = uuid('00000000-0000-0000-0000-000000000000');
