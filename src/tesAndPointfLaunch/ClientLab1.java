@@ -1,7 +1,7 @@
 package tesAndPointfLaunch;
 
-import order.Order;
-import order.OrderListInterface;
+import model.Order;
+import model.OrderListInterface;
 
 import java.io.File;
 import java.io.FileReader;

@@ -44,7 +44,9 @@ public class Order implements OrderListInterface, List<Item> {
         return id;
     }
 
-
+    public void setId(UUID id) {
+        this.id = id;
+    }
 //================================================List=Interface========================================================
 
     @Override

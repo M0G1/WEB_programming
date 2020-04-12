@@ -1,3 +1,4 @@
+DataBase - PostgreSQL
 Item - some logic element
     item_id - UUID    (UUID)
     item_name - text      (String)

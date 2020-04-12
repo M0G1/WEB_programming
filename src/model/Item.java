@@ -41,7 +41,10 @@ public class Item implements Serializable {
 
 //==================================================Constructor=========================================================
 
-    private Item() {
+    /**
+     * пустой конструктор для пустого объекта
+     */
+    public Item() {
     }
 
 
@@ -54,6 +57,14 @@ public class Item implements Serializable {
         this.id = UUID.randomUUID();
     }
 
+    public Item(@NotNull UUID uuid, @NotNull String name, double price, int count, @NotNull Date dateOfReceipt) throws IllegalArgumentException {
+        check(name, price, count, dateOfReceipt);
+        this.name = name;
+        this.price = price;
+        this.count = count;
+        this.dateOfReceipt = dateOfReceipt;
+        this.id = uuid;
+    }
 //==============================================Getters=and=Setters=====================================================
 
 
@@ -123,7 +134,7 @@ public class Item implements Serializable {
         Item item = (Item) obj;
         if (item.count != this.count)
             return false;
-        if ( Math.abs(item.price - this.price) > Double.MIN_NORMAL)
+        if (Math.abs(item.price - this.price) > Double.MIN_NORMAL)
             return false;
         if (!item.name.equals(this.name))
             return false;

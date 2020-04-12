@@ -11,7 +11,9 @@ public class Customer implements Iterable<Order> {
     private String login;
     private List<Order> orders;
 
-//==================================================Constructor=========================================================
+    //==================================================Constructor=========================================================
+    public Customer() {
+    }
 
     public Customer(@NotNull String name, @NotNull String login, @NotNull String password) {
         this.id = UUID.randomUUID();
@@ -29,6 +31,18 @@ public class Customer implements Iterable<Order> {
 
     public String getName() {
         return name;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public void setName(String name) {
@@ -61,7 +75,7 @@ public class Customer implements Iterable<Order> {
 
 //================================================List=Methods==========================================================
 
-    public int size(){
+    public int size() {
         return this.orders.size();
     }
 
@@ -83,6 +97,10 @@ public class Customer implements Iterable<Order> {
 
     public Order remove(int index) {
         return orders.remove(index);
+    }
+
+    public boolean addAll(Collection<? extends Order> c) {
+        return orders.addAll(c);
     }
 
     @Override
