@@ -13,7 +13,7 @@ import java.util.List;
 
 public class Lab2 {
 
-
+//  надо было зкарыть
     public static void main(String[] args) {
         File file = new File("orders.txt");
 
@@ -28,33 +28,35 @@ public class Lab2 {
         if (connection == null)
             return;
 //        boolean isDeleteAll = false;
+//        убираем талицы и данные
         DataBase.deleteAndDropAll(connection);
+//        создаем таблицы
         DataBase.createTables(connection);
         System.out.println("delete all: " + DataBase.deleteAllData(connection) + "\n");
-
+//        добавляем в бд данные
         insert(connection, cust);
         System.out.println();
-
+//получить пользователя по паролю и логину
         Customer customer = CustomerDML.getExistCustomer(connection, cust[2].getLogin(), cust[2].getPassword());
         System.out.println(customer + "\n");
         System.out.println(cust[2] + "\n");
-
+//        список заказов пользователя
         List<Order> orders2 = CustomerOrdersDML.getOrder(connection, cust[2].getId());
         System.out.println(Arrays.toString(orders2.toArray()));
-
+//      список элементов заказа
         List<Item> items2 = OrderItemDML.getItem(connection, orders2.get(0).getId());
         System.out.println(Arrays.toString(items2.toArray()));
-
+//      Получить заказы по совпадающему по подстроке адресу
         Order[] orders3 = OrderDML.getOrders(connection, "City");
         System.out.println(Arrays.toString(orders3));
         System.out.println();
         System.out.println(Arrays.toString(orders));
-
+//        получить полльзователей по аддрессу доставки(для 1 точки выдачи всех пользователей)
         ArrayList<Customer> customers = CustomerDML.getCustomerForAddress(connection, "st.1");
         System.out.println(Arrays.toString(customers.toArray()));
         System.out.println();
-
-//        delete(connection, cust);
+//        удаление данных с бд по существующим пользователям(переданным как параметр)
+        delete(connection, cust);
 
     }
 
