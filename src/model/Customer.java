@@ -13,6 +13,10 @@ public class Customer implements Iterable<Order> {
 
     //==================================================Constructor=========================================================
     public Customer() {
+        this.name = "";
+        this.login = "";
+        this.password = "";
+        orders = new ArrayList<>();
     }
 
     public Customer(@NotNull String name, @NotNull String login, @NotNull String password) {
@@ -73,7 +77,23 @@ public class Customer implements Iterable<Order> {
         return cust.password.equals(this.password);
     }
 
-//================================================List=Methods==========================================================
+    @Override
+    public String toString() {
+        StringBuilder orderStr = new StringBuilder();
+        for(Order order:orders){
+            orderStr.append("\n\t");
+            orderStr.append(order.toString(1));
+        }
+        return "Customer{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", password='" + password + '\'' +
+                ", login='" + login + '\'' +
+                ", orders=" + orderStr.toString() +
+                '}';
+    }
+
+    //================================================List=Methods==========================================================
 
     public int size() {
         return this.orders.size();
@@ -107,4 +127,5 @@ public class Customer implements Iterable<Order> {
     public Iterator<Order> iterator() {
         return this.orders.iterator();
     }
+
 }

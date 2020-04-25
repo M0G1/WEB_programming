@@ -24,4 +24,68 @@ public class DataBase {
         return connection;
     }
 
+    public static int deleteAllData(Connection connection) {
+        int sum = 0;
+        int res = -1;
+        try {
+            String[] delete_requests = {
+                    "delete from \"OrderItem\"; ",
+                    "delete from \"CustomerOrders\"; ",
+                    "delete from \"Item\"; ",
+                    "delete from \"Order\"; ",
+                    "delete from \"Customer\"; "
+            };
+            Statement stmt = connection.createStatement();
+            for (int i = 0; i < delete_requests.length; ++i) {
+                System.out.print(delete_requests[i]);
+                res = stmt.executeUpdate(delete_requests[i]);
+                System.out.println(" result: " + res);
+                sum += res;
+            }
+            stmt.close();
+        } catch (SQLException e) {
+            System.err.println("Connection to" + DATA_BASE_LOCATION + " with owner " + USER_INFO[0] + " failed");
+        }
+        return sum;
+    }
+
+    public static int deleteAndDropAll(Connection connection) {
+        deleteAllData(connection);
+        int sum = 0;
+        int res = -1;
+        try {
+            String[] drop_requests = {
+                    "Drop TABLE IF EXISTS \"OrderItem\" CASCADE;",
+                    "Drop TABLE IF EXISTS \"CustomerOrders\" CASCADE;",
+                    "Drop TABLE IF EXISTS \"Item\" CASCADE;",
+                    "Drop TABLE IF EXISTS \"Order\" CASCADE;",
+                    "Drop TABLE IF EXISTS \"Customer\" CASCADE;"
+            };
+            Statement stmt = connection.createStatement();
+            for (int i = 0; i < drop_requests.length; ++i) {
+                System.out.print(drop_requests[i]);
+                res = stmt.executeUpdate(drop_requests[i]);
+//                System.out.println(" result: " + res);
+                sum += res;
+            }
+            stmt.close();
+        } catch (SQLException e) {
+            System.err.println("Connection to" + DATA_BASE_LOCATION + " with owner " + USER_INFO[0] + " failed");
+        }
+        return sum;
+    }
+
+    public static int createTables(Connection connection) {
+        int sum = 0;
+        sum += ItemDML.createTable(connection);
+        sum += OrderDML.createTable(connection);
+        sum += CustomerDML.createTable(connection);
+        sum += OrderItemDML.createTable(connection);
+        sum += CustomerOrdersDML.createTable(connection);
+
+        System.out.println("Result of creating TABLES: " + sum);
+
+        return sum;
+
+    }
 }

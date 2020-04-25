@@ -19,7 +19,7 @@ public class Order implements OrderListInterface, List<Item> {
 
     public Order(String address) {
         this.address = address;
-        this.id= UUID.randomUUID();
+        this.id = UUID.randomUUID();
         itemList = new ArrayList<>();
     }
 
@@ -178,6 +178,34 @@ public class Order implements OrderListInterface, List<Item> {
 
     //==========================================Task====================================================
 
+    //==========================================Static=Read=Write=Method================================================
+    public static void writeList(@NotNull Writer out, @NotNull Order order, char separator) throws IOException {
+        out.write(order.id.toString() + "\n" + order.getAddress() + "\n" +
+                order.size() + "\n");
+        if (order.size() > 0) {
+            for (Item item : order)
+                Item.writeItem(out, item, separator);
+        }
+        out.write("\n");
+    }
+
+    public static Order readOrder(@NotNull BufferedReader in, char separator) throws IOException, ParseException {
+
+        String id = in.readLine();
+        String addr = in.readLine();
+        int size = Integer.parseInt(in.readLine());
+
+        Order answer = new Order(addr);
+        answer.id = UUID.fromString(id);
+        String orders = in.readLine();
+
+        StringReader ordersReaders = new StringReader(orders);
+        for (int i = 0; i < size; ++i) {
+            Item item = Item.readItem(ordersReaders, separator);
+            answer.add(item);
+        }
+        return answer;
+    }
 
     @Override
     public Order sortAndSaveUnique(Order order) throws RemoteException {
@@ -198,33 +226,24 @@ public class Order implements OrderListInterface, List<Item> {
         return ans;
     }
 
-    //==========================================Static=Read=Write=Method================================================
-    public static void writeList(@NotNull Writer out, @NotNull Order order, char separator) throws IOException {
-        out.write(order.getAddress() + "\n" +
-                order.size() + "\n");
-        if (order.size() > 0) {
-            for (Item item : order)
-                Item.writeOrder(out, item, separator);
-        }
-        out.write("\n");
+    @Override
+    public String toString() {
+        return toString(0);
     }
 
-    public static Order readOrders(@NotNull Reader in, char separator) throws IOException, ParseException {
-
-        BufferedReader reader = new BufferedReader(in);
-
-        String addr = reader.readLine();
-        int size = Integer.parseInt(reader.readLine());
-
-        Order answer = new Order(addr);
-        String orders = reader.readLine();
-
-        StringReader ordersReaders = new StringReader(orders);
-        for (int i = 0; i < size; ++i) {
-            Item item = Item.readOrder(ordersReaders, separator);
-            answer.add(item);
+    public String toString(int deep) {
+        StringBuilder orderStr = new StringBuilder();
+        for (Item item : itemList) {
+            orderStr.append('\n');
+            for (int i = 0; i < deep + 1; ++i)
+                orderStr.append('\t');
+            orderStr.append(item.toString());
         }
-        return answer;
+        return "Order{" +
+                "id=" + id +
+                ", address='" + address + '\'' +
+                ", itemList=" + orderStr.toString() +
+                "}\n";
     }
 
 

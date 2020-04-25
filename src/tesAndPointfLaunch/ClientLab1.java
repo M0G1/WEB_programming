@@ -3,10 +3,7 @@ package tesAndPointfLaunch;
 import model.Order;
 import model.OrderListInterface;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -23,10 +20,10 @@ public class ClientLab1 {
     public static void main(String[] args) {
 
         FileWriter writer;
-        FileReader reader;
+        BufferedReader reader;
         try {
             //System.out.print;
-            reader = new FileReader(new File(args[0]));
+            reader = new BufferedReader(new FileReader(new File(args[0])));
             writer = new FileWriter(new File(args[1]));
 
             try {
@@ -41,7 +38,7 @@ public class ClientLab1 {
                 OrderListInterface server = (OrderListInterface) registry.lookup(UNIQUE_BINDING_NAME);
 
                 //считываем
-                Order readOrder = Order.readOrders(reader, ';');
+                Order readOrder = Order.readOrder(reader, ';');
 
                 writer.write("OrderList before: " + Arrays.toString(readOrder.toArray()) + "\n");
 

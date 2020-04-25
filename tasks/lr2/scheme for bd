@@ -3,8 +3,8 @@ Item - some logic element
     item_id - UUID    (UUID)
     item_name - text      (String)
     item_count - Number      (int)
-    price - double       (double)
     dateOfReceipt - Data (Date)
+    price - double       (double)
 
 OrderItem - relationship between tables
     item_id - Number

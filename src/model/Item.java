@@ -36,7 +36,7 @@ public class Item implements Serializable {
     private static void check(String name, double price, int count, Date dateOfReceipt) throws IllegalArgumentException {
         checkPrice(price);
         checkCount(count);
-        checkDateOfReceipt(dateOfReceipt);
+//        checkDateOfReceipt(dateOfReceipt);
     }
 
 //==================================================Constructor=========================================================
@@ -106,9 +106,13 @@ public class Item implements Serializable {
         return dateOfReceipt;
     }
 
-    public void setDateOfReceipt(Date dateOfReceipt) {
-        checkDateOfReceipt(dateOfReceipt);
-        this.dateOfReceipt = dateOfReceipt;
+    /*"""
+        It use the method toStringToFile to write in file(format). And plus '\n'
+        For data format is standart of DateFormat.getInstance()
+        Recomended use "\n" separator
+    """*/
+    public static void writeItem(@NotNull Writer out, @NotNull Item item, @NotNull char separator) throws IOException {
+        out.write(item.toStringToFile() + separator);
     }
 
 //================================================Object=Method=========================================================
@@ -151,40 +155,11 @@ public class Item implements Serializable {
         return ans;
     }
 
-    @Override
-    public String toString() {
-        Formatter ans = new Formatter();
-        ans.format("order name: %s ", name);
-        ans.format("count: %d ", count);
-        ans.format("price: %f ", price);
-        ans.format("date of receipt: %s", dateOfReceipt.toString());
-        return ans.toString();
-    }
-
-    public String toStringToFile() {
-        DateFormat df = DateFormat.getDateInstance();
-        return this.getName() + " , " +
-                this.getCount() + " , " +
-                this.getPrice() + " , " +
-                df.format(this.getDateOfReceipt());
-    }
-
-//==========================================Static=Read=Write=Method====================================================
-
-    /*"""
-        It use the method toStringToFile to write in file(format). And plus '\n'
-        For data format is standart of DateFormat.getInstance()
-        Recomended use "\n" separator
-    """*/
-    public static void writeOrder(@NotNull Writer out, @NotNull Item item, @NotNull char separator) throws IOException {
-        out.write(item.toStringToFile() + separator);
-    }
-
     /*"""
         It use the method toStringToFile to read in file(format).  And plus '\n'
         For data format is standart of DateFormat.getInstance()
     """*/
-    public static Item readOrder(@NotNull Reader in, @NotNull char separator) throws IOException, ParseException {
+    public static Item readItem(@NotNull Reader in, @NotNull char separator) throws IOException, ParseException {
         Item ans = null;
 
         DateFormat df = DateFormat.getDateInstance();
@@ -195,16 +170,43 @@ public class Item implements Serializable {
             temp.append(curChar);
         }
         String[] data = temp.toString().split(" , ");
-        int count = Integer.parseInt(data[1]);
-        double price = Double.parseDouble(data[2]);
-        Date date = df.parse(data[3]);
+        int count = Integer.parseInt(data[2]);
+        double price = Double.parseDouble(data[3]);
+        Date date = df.parse(data[4]);
 
         ans = new Item();
-        ans.name = data[0];
+        ans.name = data[1];
         ans.count = count;
         ans.price = price;
         ans.dateOfReceipt = date;
+        ans.id = UUID.fromString(data[0]);
 
         return ans;
+    }
+
+    public void setDateOfReceipt(Date dateOfReceipt) {
+//        checkDateOfReceipt(dateOfReceipt);
+        this.dateOfReceipt = dateOfReceipt;
+    }
+
+//==========================================Static=Read=Write=Method====================================================
+
+    @Override
+    public String toString() {
+        Formatter ans = new Formatter();
+        ans.format("Item id: %s ", id.toString());
+        ans.format("name: %s ", name);
+        ans.format("count: %d ", count);
+        ans.format("price: %f ", price);
+        ans.format("date of receipt: %s", dateOfReceipt.toString());
+        return ans.toString();
+    }
+
+    public String toStringToFile() {
+        DateFormat df = DateFormat.getDateInstance();
+        return this.id.toString()+ " , " + this.getName() + " , " +
+                this.getCount() + " , " +
+                this.getPrice() + " , " +
+                df.format(this.getDateOfReceipt());
     }
 }

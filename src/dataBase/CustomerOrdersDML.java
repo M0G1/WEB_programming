@@ -8,7 +8,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class CustomerOrdersDML {
@@ -22,15 +24,56 @@ public class CustomerOrdersDML {
     private static final String ORDER_ID = "order_id";
     private static final String ADDRESS = "address";
 
-    public static boolean insert(@NotNull Connection connection, @NotNull UUID customerId, @NotNull UUID orderId) {
-        boolean res = false;
+    public static int createTable(Connection connection) {
+        int res = -1;
         try {
             Statement stmt = connection.createStatement();
-            String insert_request = "INSERT INTO " + TABLE_NAME + " VALUES(" +
-                    "uuid('" + customerId.toString() + "'), '," +
-                    "uuid('" + orderId.toString() + "'), ');";
+            String create_request = "-- Table: public.\"CustomerOrders\"\n" +
+                    "\n" +
+                    "-- DROP TABLE public.\"CustomerOrders\";\n" +
+                    "\n" +
+                    "CREATE TABLE IF NOT EXISTS public.\"CustomerOrders\"\n" +
+                    "(\n" +
+                    "    customer_id uuid NOT NULL,\n" +
+                    "    order_id uuid NOT NULL,\n" +
+                    "    CONSTRAINT \"CustomerOrders_pkey\" PRIMARY KEY (customer_id, order_id),\n" +
+                    "    CONSTRAINT customer_id FOREIGN KEY (customer_id)\n" +
+                    "        REFERENCES public.\"Customer\" (customer_id) MATCH SIMPLE\n" +
+                    "        ON UPDATE NO ACTION\n" +
+                    "        ON DELETE NO ACTION,\n" +
+                    "    CONSTRAINT order_id FOREIGN KEY (order_id)\n" +
+                    "        REFERENCES public.\"Order\" (order_id) MATCH SIMPLE\n" +
+                    "        ON UPDATE NO ACTION\n" +
+                    "        ON DELETE NO ACTION\n" +
+                    ")\n" +
+                    "\n" +
+                    "TABLESPACE pg_default;\n" +
+                    "\n" +
+                    "ALTER TABLE public.\"CustomerOrders\"\n" +
+                    "    OWNER to ssau_web;\n" +
+                    "COMMENT ON TABLE public.\"CustomerOrders\"\n" +
+                    "    IS 'lab for web programming';";
+            res = stmt.executeUpdate(create_request);
+            System.out.println("TABLE " + TABLE_NAME + "- created ");
+            stmt.close();
+        } catch (SQLException e) {
+            System.err.println(e.getSQLState());
+            res = -1;
+        }
+        return res;
+    }
 
-            res = stmt.execute(insert_request);
+    public static int insert(@NotNull Connection connection, @NotNull UUID customerId, @NotNull UUID orderId) {
+        int res = 0;
+        try {
+            String insert_request = "INSERT INTO " + TABLE_NAME + " VALUES(" +
+                    "uuid('" + customerId.toString() + "'), " +
+                    "uuid('" + orderId.toString() + "'));";
+            System.out.print(insert_request);
+
+            Statement stmt = connection.createStatement();
+            res = stmt.executeUpdate(insert_request);
+            System.out.println(" result: " + res);
             //autocommit
             stmt.close();
         } catch (SQLException e) {
@@ -42,14 +85,16 @@ public class CustomerOrdersDML {
     /**
      * удаляет все связи список-элемент из БД для заданного списка
      */
-    public static boolean deleteCustomer(@NotNull Connection connection, @NotNull UUID customerId) {
-        boolean res = false;
+    public static int deleteCustomer(@NotNull Connection connection, @NotNull UUID customerId) {
+        int res = -1;
         try {
             Statement stmt = connection.createStatement();
             String delete_request = "DELETE FROM " + TABLE_NAME +
-                    "WHERE " + ORDER_ID + "=uuid(" + customerId.toString() + "') ;";
+                    " WHERE " + CUSTOMER_ID + "=uuid('" + customerId.toString() + "');";
+            System.out.print(delete_request);
             //autocommit
-            stmt.execute(delete_request);
+            res = stmt.executeUpdate(delete_request);
+            System.out.println(" result: " + res);
             stmt.close();
         } catch (SQLException e) {
             System.err.println(e.getSQLState());
@@ -57,15 +102,17 @@ public class CustomerOrdersDML {
         return res;
     }
 
-    public static boolean delete(@NotNull Connection connection, @NotNull UUID customerId, @NotNull UUID orderId) {
-        boolean res = false;
+    public static int delete(@NotNull Connection connection, @NotNull UUID customerId, @NotNull UUID orderId) {
+        int res = -1;
         try {
             Statement stmt = connection.createStatement();
             String delete_request = "DELETE FROM " + TABLE_NAME +
                     "WHERE " + ORDER_ID + "=uuid(" + orderId.toString() + "') AND " +
                     CUSTOMER_ID + "=uuid(" + customerId.toString() + "');";
+            System.out.print(delete_request);
             //autocommit
-            stmt.execute(delete_request);
+            res = stmt.executeUpdate(delete_request);
+            System.out.println(" result: " + res);
             stmt.close();
         } catch (SQLException e) {
             System.err.println(e.getSQLState());
@@ -73,29 +120,35 @@ public class CustomerOrdersDML {
         return res;
     }
 
-    public static Order[] getOrder(@NotNull Connection connection, @NotNull UUID customerId) {
-        Order[] res = null;
+
+    public static ArrayList<Order> getOrder(@NotNull Connection connection, @NotNull UUID customerId) {
+        ArrayList<Order> arrOrder = null;
         try {
             Statement stmt = connection.createStatement();
             String select_request = "SELECT * FROM " + O_TABLE_NAME +
                     "WHERE " + ORDER_ID + " in " +
-                    "SELECT " + ORDER_ID + " FROM" + TABLE_NAME +
-                    " WHERE " + ORDER_ID + "=uuid(" + customerId.toString() + "');";
+                    "(SELECT " + ORDER_ID + " FROM" + TABLE_NAME +
+                    " WHERE " + CUSTOMER_ID + "=uuid('" + customerId.toString() + "'));";
+            System.out.println(select_request);
+
             ResultSet resSet = stmt.executeQuery(select_request);
-            res = new Order[resSet.getFetchSize()];
+            arrOrder = new ArrayList<>();
             for (int i = 0; resSet.next(); ++i) {
-                res[i] = new Order();
-                res[i].setAddress(resSet.getString(ADDRESS));
-                res[i].setId(UUID.fromString(resSet.getString(ORDER_ID)));
+                Order temp = new Order();
+                temp.setAddress(resSet.getString(ADDRESS));
 
-                Item[] items = OrderItemDML.getItem(connection, res[i].getId());
-                res[i].addAll(Arrays.asList(items));
+                temp.setId(UUID.fromString(resSet.getString(ORDER_ID)));
+
+                List<Item> items = OrderItemDML.getItem(connection, temp.getId());
+                temp.addAll(items);
+                arrOrder.add(temp);
             }
-
+            if (arrOrder.size() == 0)
+                arrOrder = null;
             stmt.close();
         } catch (SQLException e) {
             System.err.println(e.getSQLState());
         }
-        return res;
+        return arrOrder;
     }
 }
