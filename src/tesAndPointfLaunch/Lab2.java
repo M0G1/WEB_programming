@@ -13,7 +13,8 @@ import java.util.List;
 
 public class Lab2 {
 
-//  надо было зкарыть
+
+//  своеобразный лог
     public static void main(String[] args) {
         File file = new File("orders.txt");
 
